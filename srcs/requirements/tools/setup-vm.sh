@@ -6,17 +6,17 @@
 # have to install git manually because the minimal version of debian dont ship with it by default
 
 # update the system
-apt update && apt upgrade -y && apt install sudo
+apt update && apt upgrade -y && apt install sudo -y
 
 # clone git repo for the project for now
 
 
 # add user luuk so we dont have to login as root all the time
 # todo: see if we can restrict luuk from what i can do with sudo??
-usermod -aG luuk
+usermod -aG sudo luuk
 
 # https://docs.docker.com/engine/install/debian/
-apt install ca-certificates curl
+apt install ca-certificates curl -y
 install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
 chmod a+r /etc/apt/keyrings/docker.asc
