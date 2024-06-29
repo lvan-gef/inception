@@ -35,5 +35,7 @@ apt update
 apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # auto login for new user
-str='ExecStart=-/sbin/agetty --autologin luuk --noclear %I $TERM'
-sed -i "/^ExecStart=/c\\$str" "$file" /etc/systemd/system/getty.target.wants/getty@tty1.service
+# str='ExecStart=-/sbin/agetty --autologin luuk --noclear %I $TERM'
+# file='/etc/systemd/system/getty.target.wants/getty@tty1.service'
+# sed -i "/^ExecStart=/c\\$str" "$file"
+
