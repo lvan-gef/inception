@@ -32,7 +32,7 @@ echo \
 apt update
 
 # install docker
-apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
 # auto login for new user
 # str='ExecStart=-/sbin/agetty --autologin luuk --noclear %I $TERM'
