@@ -7,10 +7,10 @@
 # and clone it manually
 
 # update the system
-apt update && apt upgrade -y && apt install sudo -y
+apt update && apt upgrade -y && apt install sudo vim -y
 
 # add user luuk so we dont have to login as root all the time
-# todo: see if we can restrict luuk from what i can do with sudo??
+# todo: see if we can restrict luuk from what it can do with sudo??
 usermod -aG sudo luuk
 adder="luuk ALL=(ALL:ALL) NOPASSWD: ALL"
 grep "$adder" /etc/sudoers
@@ -33,3 +33,7 @@ apt update
 
 # install docker
 apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# auto login for new user
+str='ExecStart=-/sbin/agetty --autologin luuk --noclear %I $TERM'
+sed -i "/^ExecStart=/c\\$str" "$file" /etc/systemd/system/getty.target.wants/getty@tty1.service
