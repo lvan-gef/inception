@@ -3,12 +3,16 @@
 # this script will be run as root after the first boot of the vm
 # have to do it manually
 
+# have to install git manually because the minimal version of debian dont ship with it by default
+
 # update the system
-apt update && apt upgrade -y
+apt update && apt upgrade -y && apt install sudo
+
+# clone git repo for the project for now
+
 
 # add user luuk so we dont have to login as root all the time
 # todo: see if we can restrict luuk from what i can do with sudo??
-apt install sudo
 usermod -aG luuk
 
 # https://docs.docker.com/engine/install/debian/
