@@ -26,7 +26,15 @@ RUN wget https://www.openssl.org/source/openssl-${SSL_VERSION}.tar.gz && \
 	ln -s /usr/local/openssl/bin/openssl /usr/bin/openssl
 
 # generate self signed certificate
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt
+RUN apt install libssl
+RUN openssl req  \
+	-x509  \
+	-nodes \
+	-days 365 \
+	-newkey rsa:4096 \
+	-sub "/C=NL/ST=Denial/L=Earth/O=Dis/CN=codam" \
+	-keyout /etc/ssl/private/nginx-selfsigned.key \
+	-out /etc/ssl/certs/nginx-selfsigned.crt
 
 # create key for Perfect Forward Secrecy
 # RUN openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
@@ -47,3 +55,7 @@ RUN rm -f nginx-${NGINX_VERSION}.tar.gz openssl-${SSL_VERSION}.tar.gz
 
 # run nginx
 CMD ["/usr/local/nginx/sbin/nginx", "-g", "daemon off;"]
+
+
+
+# openssl req -x509 -new -nodes -newkey rsa:2048 -days 365 -subj "/C=US/ST=Denial/L=Earth/O=Dis/CN=anything_but_whitespace" -out self-signed.crt -keyout private.key
