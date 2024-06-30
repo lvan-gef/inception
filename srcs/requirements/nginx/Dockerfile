@@ -2,30 +2,44 @@ FROM debian:bullseye-slim
 
 RUN apt update && apt upgrade -y
 
-ENV NGINX-VERSION=1.26.1
-ENV SSL-VERSION=3.3.1
+ENV NGINX_VERSION=1.26.1
+ENV SSL_VERSION=3.3.1
 
 # install nginx from source
 WORKDIR /tmp
 RUN apt install build-essential libpcre3 libpcre3-dev zlib1g zlib1g-dev libssl-dev wget -y
-RUN wget https://nginx.org/download/nginx-${NGINX-VERSION}.tar.gz && \
-    tar -zxvf nginx-${NGINX-VERSION}.tar.gz && \
-    cd nginx-${NGINX-VERSION} && \
+RUN wget https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz && \
+    tar -zxvf nginx-${NGINX_VERSION}.tar.gz && \
+    cd nginx-${NGINX_VERSION} && \
     ./configure && \
     make && \
     make install
 
 # install openssh from source
-RUN wget https://www.openssl.org/source/openssl-${SSL-VERSION}.tar.gz && \
-	tar -zxvf openssl-${SSL-VERSION}.tar.gz && \
-	cd openssl-${SSL-VERSION} && \
-	./conf --prefix=/usr/local --openssldir=/usr/local && \
+RUN wget https://www.openssl.org/source/openssl-${SSL_VERSION}.tar.gz && \
+	tar -zxvf openssl-${SSL_VERSION}.tar.gz && \
+	cd openssl-${SSL_VERSION} && \
+	./config --prefix=/usr/local --openssldir=/usr/local && \
 	make && \
 	make install && \
 	rm -f /usr/bin/openssl && \
 	ln -s /usr/local/openssl/bin/openssl /usr/bin/openssl
 
-CMD ["/usr/local/nginx/sbin/nginx", "-g", "daemon off;"]
+# generate self signed certificate
 
 # Expose ports
 EXPOSE 443
+
+# clean up
+RUN rm -f nginx-${NGINX_VERSION}.tar.gz openssl-${SSL_VERSION}.tar.gz
+
+# create a nginx user to run nginx
+RUN useradd -M -s /usr/sbin/nologin --uid 1066 --user-group nginx && \
+	apt update && apt install libcap2-bin -y && \
+	setcap CAP_NET_BIND_SERVICE=+eip /nginx && \
+	chown -R nginx. /etc/nginx
+
+USER nginx
+
+# run nginx
+CMD ["/usr/local/nginx/sbin/nginx", "-g", "daemon off;"]
