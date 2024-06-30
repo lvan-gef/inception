@@ -1,7 +1,5 @@
 #! /bin/bash
 
-# TODO: check sha sums
-
 NGINX_VERSION="1.26.1"
 NGINX_NAME="nginx-$NGINX_VERSION"
 NGINX_PATH="$NGINX_NAME.tar.gz"
@@ -9,7 +7,6 @@ SSL_VERSION="3.3.1"
 SSL_NAME="openssl-$SSL_VERSION"
 SSL_PATH="$SSL_NAME.tar.gz"
 SSL_KEY_SIZE="4096"
-
 
 # update the container
 apt update && upt upgrade -y
@@ -25,6 +22,7 @@ cd $NGINX_NAME
 make
 make install
 cd ..
+rm -f $NGINX_PATH
 
 # openssl download and build from source
 wget https://www.openssl.org/source/$SSL_PATH
@@ -33,9 +31,15 @@ cd $SSL_NAME
 ./config --prefix=/usr/local --openssldir=/usr/local
 make
 make install
-rm -f /usr/bin/openssl
-ln -s /usr/local/openssl/bin/openssl /usr/bin/openssl
+rm -f /usr/bin/openssl  # remove openssl bin if it is already there
+ln -s /usr/local/openssl/bin/openssl /usr/bin/openssl  # make simlink to the new openssl
+echo "/usr/local/openssl/lib" > /etc/ld.so.conf.d/openssl.conf  #
+ldconfig
 cd ..
+rm -f $SSL_PATH
+
+# remove openssl if it is installed
+apt remove --purge openssl -y && apt autoremove -y && apt autoclean
 
 # create self signed certificate
 openssl req \
@@ -47,19 +51,14 @@ openssl req \
 	-keyout /etc/ssl/private/nginx-selfsigned.key \
 	-out /etc/ssl/certs/nginx-selfsigned.crt
 
+# create key for Perfect Forward Secrecy
+openssl dhparam -out /etc/ssl/certs/dhparam.pem $SSL_KEY_SIZE
+
 # create a nginx user to run nginx
 # useradd -M -s /usr/sbin/nologin --uid 1066 --user-group nginx
 # apt update && apt install libcap2-bin -y
 # setcap CAP_NET_BIND_SERVICE=+eip /nginx
 # chown -R /tmp/nginx. /etc/nginx
 
-# create key for Perfect Forward Secrecy
-openssl dhparam -out /etc/ssl/certs/dhparam.pem $SSL_KEY_SIZE
-
-# remove openssl if it is installed
-apt remove --purge openssl -y && apt autoremove -y && apt autoclean
-
 # create snippets for nginx
 
-# clean up
-rm -f $NGINX_PATH
