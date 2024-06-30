@@ -26,6 +26,10 @@ RUN wget https://www.openssl.org/source/openssl-${SSL_VERSION}.tar.gz && \
 	ln -s /usr/local/openssl/bin/openssl /usr/bin/openssl
 
 # generate self signed certificate
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt
+
+# create key for Perfect Forward Secrecy
+# RUN openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
 
 # create a nginx user to run nginx
 # RUN useradd -M -s /usr/sbin/nologin --uid 1066 --user-group nginx && \
