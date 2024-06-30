@@ -2,27 +2,17 @@ FROM debian:bullseye-slim
 
 RUN apt update && apt upgrade -y
 
-# prerequisites for ngnix
-RUN apt install curl gnupg2 ca-certificates lsb-release debian-archive-keyring wget -y
+ENV VERSION=1.26.1
 
-# add signing key
-RUN curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor \
-    | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+# install nginx from source
+RUN apt install build-essential libpcre3 libpcre3-dev zlib1g zlib1g-dev libssl-dev wget -y
+RUN wget https://nginx.org/download/nginx-${VERSION}.tar.gz && \
+    tar -zxvf nginx-${VERSION}.tar.gz && \
+    cd nginx-${VERSION} && \
+    ./configure && \
+    make && \
+    make install
 
-# do some keychecking
-# RUN gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
-
-# add nginx-stable to the apt repolist
-RUN echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \
-	https://nginx.org/packages/debian `lsb_release -cs` nginx" \
-    | tee /etc/apt/sources.list.d/nginx.list
-
-# pinned the nginx repo over distro repo
-RUN echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" \
-    | tee /etc/apt/preferences.d/99nginx
-
-# update and install nginx
-RUN apt update && apt install nginx -y
 
 CMD ["/usr/local/nginx/sbin/nginx", "-g", "daemon off;"]
 
