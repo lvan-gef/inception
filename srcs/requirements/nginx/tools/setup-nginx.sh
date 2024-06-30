@@ -3,15 +3,13 @@
 # TODO: check sha sums
 
 NGINX_VERSION="1.26.1"
-NGINX_NAME="ngnix-$NGINX_VERSION"
+NGINX_NAME="nginx-$NGINX_VERSION"
 NGINX_PATH="$NGINX_NAME.tar.gz"
 SSL_VERSION="3.3.1"
 SSL_NAME="openssl-$SSL_VERSION"
 SSL_PATH="$SSL_NAME.tar.gz"
 SSL_KEY_SIZE="4096"
 
-# remove openssl if it is installed
-apt remove --purge openssl -y && apt autoremove -y && apt autoclean
 
 # update the container
 apt update && upt upgrade -y
@@ -57,6 +55,9 @@ openssl req \
 
 # create key for Perfect Forward Secrecy
 openssl dhparam -out /etc/ssl/certs/dhparam.pem $SSL_KEY_SIZE
+
+# remove openssl if it is installed
+apt remove --purge openssl -y && apt autoremove -y && apt autoclean
 
 # create snippets for nginx
 
