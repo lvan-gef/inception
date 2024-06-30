@@ -9,7 +9,9 @@ SSL_VERSION="3.3.1"
 SSL_NAME="openssl-$SSL_VERSION"
 SSL_PATH="$SSL_NAME.tar.gz"
 SSL_KEY_SIZE="4096"
-SSL_PATH="openssl-$SSL_VERSION.tar.gz"
+
+# remove openssl if it is installed
+apt remove --purge openssl -y && apt autoremove -y && apt autoclean
 
 # update the container
 apt update && upt upgrade -y
@@ -19,7 +21,7 @@ apt install build-essential libpcre3 libpcre3-dev zlib1g zlib1g-dev libssl-dev w
 
 # nginx download and build from source
 wget https://nginx.org/download/$NGINX_PATH
-tar -zxvf $NGINX_PATH
+tar -zxvf $NGINX_PATH -C /tmp/
 cd $NGINX_NAME
 ./configure
 make
@@ -28,13 +30,14 @@ cd ..
 
 # openssl download and build from source
 wget https://www.openssl.org/source/$SSL_PATH
-tar -zxvf $SSL_PATH
+tar -zxvf $SSL_PATH -C /tmp/
 cd $SSL_NAME
 ./config --prefix=/usr/local --openssldir=/usr/local
 make
 make install
 rm -f /usr/bin/openssl
 ln -s /usr/local/openssl/bin/openssl /usr/bin/openssl
+cd ..
 
 # create self signed certificate
 openssl req \
