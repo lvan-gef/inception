@@ -27,19 +27,19 @@ RUN wget https://www.openssl.org/source/openssl-${SSL_VERSION}.tar.gz && \
 
 # generate self signed certificate
 
+# create a nginx user to run nginx
+# RUN useradd -M -s /usr/sbin/nologin --uid 1066 --user-group nginx && \
+# 	apt update && apt install libcap2-bin -y && \
+# 	setcap CAP_NET_BIND_SERVICE=+eip /nginx && \
+# 	chown -R /tmp/nginx. /etc/nginx
+#
+# USER nginx
+
 # Expose ports
 EXPOSE 443
 
 # clean up
 RUN rm -f nginx-${NGINX_VERSION}.tar.gz openssl-${SSL_VERSION}.tar.gz
-
-# create a nginx user to run nginx
-RUN useradd -M -s /usr/sbin/nologin --uid 1066 --user-group nginx && \
-	apt update && apt install libcap2-bin -y && \
-	setcap CAP_NET_BIND_SERVICE=+eip /nginx && \
-	chown -R nginx. /etc/nginx
-
-USER nginx
 
 # run nginx
 CMD ["/usr/local/nginx/sbin/nginx", "-g", "daemon off;"]
