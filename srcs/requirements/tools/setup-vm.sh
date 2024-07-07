@@ -7,7 +7,7 @@
 # and clone it manually
 
 # update and install deps
-apt update && apt upgrade -y && apt install sudo vim git ca-certificates curl -y
+apt update && apt upgrade -y && apt install sudo vim git ca-certificates curl rsync -y
 
 # add user luuk so we dont have to login as root all the time
 # todo: see if we can restrict luuk from what it can do with sudo??
