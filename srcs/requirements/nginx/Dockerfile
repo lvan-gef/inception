@@ -1,92 +1,23 @@
-FROM alpine:3.19
+FROM debian:bullseye
 
-ARG CORES=1
-ARG OPENSSL_KEY_SIZE=4096
-ARG PORT=80
+RUN apt-get update && apt-get install -y \
+    nginx \
+    openssl \
+    && rm -rf /var/lib/apt/lists/*
 
-ENV NGINX_VERSION=1.26.1
-ENV PKG_RELEASE=2
+# Create SSL directory
+RUN mkdir -p /etc/nginx/ssl
 
-# Create nginx user/group first, to be consistent throughout docker variants
-RUN set -x \
-    && addgroup -g 101 -S nginx \
-    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx
+# Copy configuration and scripts
+COPY conf/nginx.conf /etc/nginx/nginx.conf
+COPY tools/ssl_setup.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/ssl_setup.sh
 
-# Install prerequisites for public key and pkg-oss checks and install nginx for supported architectures
-RUN set -x \
-    && apkArch="$(cat /etc/apk/arch)" \
-    && nginxPackages="nginx=${NGINX_VERSION}-r${PKG_RELEASE}" \
-    && apk add --no-cache --virtual .checksum-deps openssl \
-    && case "$apkArch" in x86_64|aarch64) KEY_SHA512="e09fa32f0a0eab2b879ccbbc4d0e4fb9751486eedda75e35fac65802cc9faa266425edf83e261137a2f4d16281ce2c1a5f4502930fe75154723da014214f0655" \
-    && wget -O /tmp/nginx_signing.rsa.pub https://nginx.org/keys/nginx_signing.rsa.pub \
-    && if echo "$KEY_SHA512 */tmp/nginx_signing.rsa.pub" | sha512sum -c -; then \
-		echo "key verification succeeded!"; \
-			mv /tmp/nginx_signing.rsa.pub /etc/apk/keys/; \
-		else \
-			echo "key verification failed!"; exit 1; \
-        fi \
-    && apk add -X "https://nginx.org/packages/alpine/v$(egrep -o '^[0-9]+\.[0-9]+' /etc/alpine-release)/main" --no-cache $nginxPackages ;; *) tempDir="$(mktemp -d)" \
-    && chown nobody:nobody $tempDir \
-    && apk add --no-cache --virtual .build-deps gcc libc-dev make openssl-dev pcre2-dev zlib-dev linux-headers bash alpine-sdk findutils \
-	&& su nobody -s /bin/sh -c " \
-		export HOME=${tempDir} \
-        && cd ${tempDir} \
-        && curl -f -O https://hg.nginx.org/pkg-oss/archive/${NGINX_VERSION}-${PKG_RELEASE}.tar.gz \
-        && PKGOSSCHECKSUM=\"0db2bf5f86e7c31f23d0e3e7699a5d8a4d9d9b0dc2f98d3e3a31e004df20206270debf6502e4481892e8b64d55fba73fcc8d74c3e0ddfcd2d3f85a17fa02a25e *${NGINX_VERSION}-${PKG_RELEASE}.tar.gz\" \
-        && if [ \"\$(openssl sha512 -r ${NGINX_VERSION}-${PKG_RELEASE}.tar.gz)\" = \"\$PKGOSSCHECKSUM\" ]; then \
-				echo \"pkg-oss tarball checksum verification succeeded!\"; \
-            else \
-                echo \"pkg-oss tarball checksum verification failed!\"; exit 1; \
-                fi \
-        && tar xzvf ${NGINX_VERSION}-${PKG_RELEASE}.tar.gz \
-        && cd pkg-oss-${NGINX_VERSION}-${PKG_RELEASE}/alpine \
-        && make base -j${CORES}\
-        && apk index --allow-untrusted -o ${tempDir}/packages/alpine/${apkArch}/APKINDEX.tar.gz ${tempDir}/packages/alpine/${apkArch}/*.apk \
-        && abuild-sign -k ${tempDir}/.abuild/abuild-key.rsa ${tempDir}/packages/alpine/${apkArch}/APKINDEX.tar.gz \
-	" \
-    && cp ${tempDir}/.abuild/abuild-key.rsa.pub /etc/apk/keys/ \
-    && apk del --no-network .build-deps \
-    && apk add -X ${tempDir}/packages/alpine/ --no-cache $nginxPackages ;; esac \
-    && apk del --no-network .checksum-deps \
-    && if [ -n "$tempDir" ]; then rm -rf "$tempDir"; fi \
-    && if [ -f "/etc/apk/keys/abuild-key.rsa.pub" ]; then rm -f /etc/apk/keys/abuild-key.rsa.pub; fi
+# Generate SSL certificate
+RUN /usr/local/bin/ssl_setup.sh
 
-# Install gettext and envsubst, then clean up gettext
-RUN set -x \
-    && apk add --no-cache --virtual .gettext gettext \
-    && mv /usr/bin/envsubst /tmp/ \
-    && runDeps="$( \
-        scanelf --needed --nobanner /tmp/envsubst \
-            | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
-            | sort -u \
-            | xargs -r apk info --installed \
-            | sort -u \
-    )" \
-    && apk add --no-cache $runDeps \
-    && apk del --no-network .gettext \
-    && mv /tmp/envsubst /usr/local/bin/
+# Expose HTTPS port
+EXPOSE 443
 
-# Install tzdata for timezone setting and create necessary directories and symbolic links
-RUN set -x \
-    && apk add --no-cache tzdata \
-    && mkdir -p /var/log/nginx \
-    && ln -sf /dev/stdout /var/log/nginx/access.log \
-    && ln -sf /dev/stderr /var/log/nginx/error.log
-
-# Create a docker-entrypoint.d directory
-RUN mkdir /docker-entrypoint.d
-
-COPY tools/docker-entrypoint.sh /
-RUN chown nginx:nginx /docker-entrypoint.sh && chmod +x /docker-entrypoint.sh
-ENTRYPOINT ["/docker-entrypoint.sh"]
-
-RUN apk add openssl && openssl req -x509 -nodes -days 365 -newkey rsa:${OPENSSL_KEY_SIZE} -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt -subj "/C=US/ST=State/L=City/O=Organization/OU=Department/CN=localhost"
-RUN sed -i 's/listen       80;/listen 443 ssl;\n    server_name localhost;\n    ssl_certificate \/etc\/ssl\/certs\/nginx-selfsigned.crt;\n    ssl_certificate_key \/etc\/ssl\/private\/nginx-selfsigned.key;/' /etc/nginx/conf.d/default.conf
-
-# clean up
-RUN apk del -r gcc musl-dev linux-headers perl bash wget openssl-dev build-base linux-headers openssl
-RUN rm -rf /var/cache/apk/*
-
-STOPSIGNAL SIGQUIT
-EXPOSE ${PORT}
+# Start NGINX
 CMD ["nginx", "-g", "daemon off;"]
