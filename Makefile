@@ -5,15 +5,10 @@ all: prepare build up
 
 .PHONY: prepare
 prepare:
-	# @mkdir -p /home/$(USER)/data/wordpress
-	# @mkdir -p /home/$(USER)/data/mariadb
-	# @mkdir -p /Users/luxesound/data/wordpress
-	# @mkdir -p /Users/luxesound/data/mariadb
-	# @echo "Data directories created."
-	mkdir -p /Users/luxesound/data/wordpress
-	mkdir -p /Users/luxesound/data/mariadb
-	# @sudo chown -R $(USER):$(USER) /home/$(id -un)/data
-	# @sudo chmod -R 755 /Users/$(id -un)/data
+	@mkdir -p /home/$(USER)/data/wordpress
+	@mkdir -p /home/$(USER)/data/mariadb
+	# mkdir -p /Users/luxesound/data/wordpress
+	# mkdir -p /Users/luxesound/data/mariadb
 	@echo "Data directories created with correct permissions."
 
 .PHONY: build
@@ -34,7 +29,7 @@ down:
 .PHONY: clean
 clean: down
 	@docker system prune -af
-	@sudo rm -rf /Users/luxesound/data
+	@rm -rf /home/$(USER)/luxesound/data
 	@echo "Environment cleaned."
 
 .PHONY: re

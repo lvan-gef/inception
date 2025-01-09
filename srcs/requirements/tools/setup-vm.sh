@@ -11,12 +11,12 @@ apt update && apt upgrade -y && apt install sudo vim git ca-certificates curl rs
 
 # add user luuk so we dont have to login as root all the time
 # todo: see if we can restrict luuk from what it can do with sudo??
-usermod -aG sudo luuk
-adder="luuk ALL=(ALL:ALL) NOPASSWD: ALL"
-grep "$adder" /etc/sudoers
-if [ $? -ne 0 ]; then
-	echo "$adder" >> /etc/sudoers
-fi
+# usermod -aG sudo luuk
+# adder="luuk ALL=(ALL:ALL) NOPASSWD: ALL"
+# grep "$adder" /etc/sudoers
+# if [ $? -ne 0 ]; then
+# 	echo "$adder" >> /etc/sudoers
+# fi
 
 # https://docs.docker.com/engine/install/debian/
 install -m 0755 -d /etc/apt/keyrings
@@ -32,6 +32,10 @@ apt update
 
 # install docker
 apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
+# docker-compose
+curl -SL https://github.com/docker/compose/releases/download/v2.32.2/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
 
 # add user luuk to docker
 groupadd docker

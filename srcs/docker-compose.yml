@@ -49,15 +49,15 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      # device: /home/${USER}/data/wordpress
-      device: /Users/luxesound/data/wordpress
+      device: /home/${USER}/data/wordpress
+      # device: /Users/luxesound/data/wordpress
       o: bind
   db_data:
     driver: local
     driver_opts:
       type: none
-      # device: /home/${USER}/data/mariadb
-      device: /Users/luxesound/data/mariadb
+      device: /home/${USER}/data/mariadb
+      # device: /Users/luxesound/data/mariadb
       o: bind
 
 networks:
