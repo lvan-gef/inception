@@ -37,5 +37,9 @@ make CMAKE_BUILD_TYPE=RelWithDebInfo
 cd build && cpack -G DEB && sudo dpkg -i nvim-linux64.deb
 rsync -az --rsh='ssh -p2222' ~/.config/nvim inception@localhost:/home/inception/.config/
 
+# nginx give a error and this solved it
+setcap cap_net_bind_service=+ep $(which rootlesskit)
+sysctl -w net.ipv4.ip_unprivileged_port_start=443
+systemctl --user restart docker
 # restart vm
 reboot
