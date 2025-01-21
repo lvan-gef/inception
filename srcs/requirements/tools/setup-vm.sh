@@ -22,9 +22,11 @@ apt update
 apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose docker-ce-rootless-extras dbus-user-session slirp4netns docker-ce-rootless-extras uidmap -y
 
 # run docker root-less script  switch to normal user
+su - inception
 sh /usr/bin/dockerd-rootless-setuptool.sh install
 # export PATH=/usr/bin:$PATH
 # export DOCKER_HOST=unix:///run/user/1000/docker.sock
+exit
 
 # setup neovim
 apt install ninja-build gettext cmake curl build-essential gcc -y
@@ -35,11 +37,11 @@ cd neovim
 git checkout stable
 make CMAKE_BUILD_TYPE=RelWithDebInfo
 cd build && cpack -G DEB && sudo dpkg -i nvim-linux64.deb
-rsync -az --rsh='ssh -p2222' ~/.config/nvim inception@localhost:/home/inception/.config/
+rsync -az --rsh='ssh -p2222' ~/.config/nvim inception@localhost:/home/inception/.config
 
 # nginx give a error and this solved it
 setcap cap_net_bind_service=+ep $(which rootlesskit)
 sysctl -w net.ipv4.ip_unprivileged_port_start=443
-systemctl --user restart docker
+
 # restart vm
 reboot
