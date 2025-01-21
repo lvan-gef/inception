@@ -1,6 +1,6 @@
 FROM debian:bullseye
 
-RUN apt-get update && apt-get install -y \
+RUN apt update && apt install -y \
     php7.4-fpm \
     php7.4-mysql \
     php7.4-curl \
@@ -11,8 +11,7 @@ RUN apt-get update && apt-get install -y \
     php7.4-xml \
     php7.4-xmlrpc \
     php7.4-zip \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+    curl
 
 # WordPress CLI installation
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
