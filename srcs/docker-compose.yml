@@ -15,6 +15,7 @@ services:
     restart: unless-stopped
     env_file:
       - ~/.local/.env
+    image: nginx
 
   wordpress:
     build:
@@ -30,6 +31,7 @@ services:
     restart: unless-stopped
     env_file:
       - ~/.local/.env
+    image: wordpress
 
   mariadb:
     build:
@@ -43,6 +45,7 @@ services:
     restart: unless-stopped
     env_file:
       - ~/.local/.env
+    image: mariadb
 
 volumes:
   wordpress_data:
