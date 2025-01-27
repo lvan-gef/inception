@@ -1,11 +1,12 @@
 #!/bin/bash
+SQLPATH="/var/lib/mysql"
 
 if [ ! -d "/var/lib/mysql/${MYSQL_DATABASE}" ]; then
     # Initialize MySQL data directory
-    mysql_install_db --user=mysql --datadir=/var/lib/mysql
+    mysql_install_db --user=mysql --datadir=${SQLPATH}
 
     # Start MySQL service temporarily
-    mysqld_safe --datadir=/var/lib/mysql &
+    mysqld_safe --datadir=${SQLPATH} &
 
     # Wait for MySQL to be ready
     until mysqladmin ping >/dev/null 2>&1; do
@@ -26,4 +27,4 @@ EOF
 fi
 
 # Start MySQL
-exec mysqld_safe --datadir=/var/lib/mysql
+exec mysqld_safe --datadir=${SQLPATH}

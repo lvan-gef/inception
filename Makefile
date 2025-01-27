@@ -33,7 +33,12 @@ down:  ## stop containers
 	@echo "Services stopped."
 
 .PHONY: clean
-clean: down  ## stop and remove container and other data
+clean: down  ## remove stopped containers
+	docker rm $(docker ps --filter status=exited -q)
+	@echo "Removed all stopped containers"
+
+.PHONY: fclean
+fclean: down  ## stop and remove container and other data
 	@docker system prune -af
 	@echo "Environment cleaned."
 

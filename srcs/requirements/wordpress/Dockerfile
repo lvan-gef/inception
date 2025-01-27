@@ -1,4 +1,4 @@
-FROM debian:bullseye
+FROM debian:bullseye-slim
 
 RUN apt update && apt install -y \
     php7.4-fpm \
@@ -22,7 +22,6 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
 COPY conf/www.conf /etc/php/7.4/fpm/pool.d/
 RUN mkdir -p /run/php
 
-# WordPress setup script
 COPY tools/wordpress_setup.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/wordpress_setup.sh
 
