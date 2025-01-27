@@ -20,6 +20,12 @@ services:
     env_file:
       - ~/.local/.env
     image: nginx
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:443"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   wordpress:
     build:
@@ -36,6 +42,12 @@ services:
     env_file:
       - ~/.local/.env
     image: wordpress
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   mariadb:
     build:
@@ -50,6 +62,12 @@ services:
     env_file:
       - ~/.local/.env
     image: mariadb
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
 volumes:
   wordpress_data:
