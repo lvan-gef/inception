@@ -29,7 +29,7 @@ up:  ## start all containers
 
 .PHONY: down
 down:  ## stop containers
-	@docker-compose -f srcs/docker-compose.yml down
+	@docker-compose -f ${DOCKER_COMPOSE_PATH} down
 	@echo "Services stopped."
 
 .PHONY: clean

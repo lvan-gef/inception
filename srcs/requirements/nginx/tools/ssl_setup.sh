@@ -1,11 +1,8 @@
 #!/bin/bash
 
-# Hardcoded paths matching nginx.conf
+# Path for ssl keys
 SSL_CERT="/etc/nginx/ssl/inception.crt"
 SSL_KEY="/etc/nginx/ssl/inception.key"
-
-# Create SSL directory if it doesn't exist
-mkdir -p /etc/nginx/ssl
 
 # Generate SSL certificate
 openssl req -x509 -nodes -days 365 -newkey rsa:4096 \

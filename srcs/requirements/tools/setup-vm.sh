@@ -24,8 +24,6 @@ apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-co
 # run docker root-less script  switch to normal user
 su - inception
 sh /usr/bin/dockerd-rootless-setuptool.sh install
-# export PATH=/usr/bin:$PATH
-# export DOCKER_HOST=unix:///run/user/1000/docker.sock
 exit
 
 # setup neovim

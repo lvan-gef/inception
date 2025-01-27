@@ -1,9 +1,7 @@
 FROM debian:bullseye
 
-RUN apt update && apt install -y \
-    mariadb-server
+RUN apt update && apt install -y mariadb-server
 
-# MariaDB configuration
 COPY conf/my.cnf /etc/mysql/my.cnf
 COPY tools/db_setup.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/db_setup.sh

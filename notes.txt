@@ -1,1 +1,0 @@
-cat ./var/www/html/wp-config.php  leak my password dam it

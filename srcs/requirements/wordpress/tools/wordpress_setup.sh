@@ -1,7 +1,6 @@
 #!/bin/bash
 
 if [ ! -f "wp-config.php" ]; then
-    # Download WordPress
     wp core download --allow-root
 
     # Create wp-config.php
@@ -16,7 +15,6 @@ define( 'WP_DEBUG_LOG', false );
 define( 'WP_DEBUG_DISPLAY', false );
 PHP
 
-    # Install WordPress
     wp core install --allow-root \
         --url=${WP_URL} \
         --title=${WP_TITLE} \
@@ -32,7 +30,6 @@ PHP
     wp widget add categories sidebar-1 --allow-root
     wp widget add recent-posts sidebar-1 --allow-root
 
-    # Install and activate a blog-friendly theme (Twenty Twenty-One is good for blogs)
     wp theme install twentytwentyone --activate --allow-root
 
     wp post create --post_type=page \
