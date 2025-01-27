@@ -23,6 +23,7 @@ PHP
         --admin_email=${WP_ADMIN_EMAIL}
 
     sleep 5
+    wp user create ${WP_EXTRA_USER} ${WP_EXTRA_EMAIL} --role=subscriber --user_pass=${WP_EXTRA_PASSWORD} --allow-root || echo "Extra user already exists"
 
     # Update directory permissions
     chown -R www-data:www-data /var/www/html

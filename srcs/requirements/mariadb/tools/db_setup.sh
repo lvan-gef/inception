@@ -1,7 +1,8 @@
 #!/bin/bash
+
 SQLPATH="/var/lib/mysql"
 
-if [ ! -d "/var/lib/mysql/${MYSQL_DATABASE}" ]; then
+if [ ! -d "${SQLPATH}/${MYSQL_DATABASE}" ]; then
     # Initialize MySQL data directory
     mysql_install_db --user=mysql --datadir=${SQLPATH}
 
@@ -26,5 +27,5 @@ EOF
     mysqladmin -u root -p${MYSQL_ROOT_PASSWORD} shutdown
 fi
 
-# Start MySQL
+# Start MySQL normally
 exec mysqld_safe --datadir=${SQLPATH}
