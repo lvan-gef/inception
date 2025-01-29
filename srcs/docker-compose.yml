@@ -21,7 +21,7 @@ services:
       - ~/.local/.env
     image: nginx
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:443"]
+      test: ["CMD", "curl", "-k", "-f", "https://localhost:443"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -43,7 +43,7 @@ services:
       - ~/.local/.env
     image: wordpress
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      test: ["CMD", "curl", "-f", "http://localhost/wp-login.php"]
       interval: 30s
       timeout: 10s
       retries: 3
