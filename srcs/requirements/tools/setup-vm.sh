@@ -4,7 +4,7 @@
 # this script will be run as root after the first boot of the vm
 
 # update and install deps
-apt update && apt upgrade -y && apt install sudo git ca-certificates curl rsync make -y
+apt update && apt upgrade -y && apt install git ca-certificates curl rsync make -y
 
 # https://docs.docker.com/engine/install/debian/
 install -m 0755 -d /etc/apt/keyrings
@@ -34,7 +34,7 @@ git clone https://github.com/neovim/neovim.git
 cd neovim
 git checkout stable
 make CMAKE_BUILD_TYPE=RelWithDebInfo
-cd build && cpack -G DEB && sudo dpkg -i nvim-linux64.deb
+cd build && cpack -G DEB && dpkg -i nvim-linux64.deb
 rsync -az --rsh='ssh -p2222' ~/.config/nvim inception@localhost:/home/inception/.config
 
 # nginx give a error and this solved it
