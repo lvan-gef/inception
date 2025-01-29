@@ -35,7 +35,7 @@ PHP
 
     wp theme install twentytwentyone --activate --allow-root
 
-    wp post create --post_type=page \
+    wp post create --post_type=post \
         --post_title='Inception' \
         --post_content='Welcome to my inception home page my friend' \
         --post_status=publish --allow-root
