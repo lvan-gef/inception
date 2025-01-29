@@ -4,7 +4,7 @@ ARG CERT_PATH
 ARG KEY_PATH
 ARG DOMAIN_NAME
 
-RUN apt update && apt install -y nginx openssl
+RUN apt update && apt install -y nginx openssl curl
 
 RUN mkdir -p /etc/nginx/ssl
 
